@@ -7,14 +7,9 @@ interface Block {
   children: { text: string }[];
 }
 
-interface BlogDetailProps {
-  params: {
-    slug: string;
-  };
-}
-
-export default async function blogDetail({ params }: BlogDetailProps) {
-  const { slug } = params;
+// Next.js automatically provides 'params' for dynamic routes
+export default async function BlogDetail({params}: {params: Promise<{ slug: string }>}) {
+  const { slug } = await params;
 
   const queryPost = `*[_type == "blogPost" && slug.current == '${slug}'][0]{
     title,
@@ -55,22 +50,6 @@ export default async function blogDetail({ params }: BlogDetailProps) {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
