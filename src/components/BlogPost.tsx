@@ -14,13 +14,25 @@ export default async function Home() {
     "imageUrl": image.asset->url
   }`;
 
+
+  interface Block {
+    slug: string,
+    title: string,
+    _createdAt : number,
+    author: string,
+    body: { children: { text: string }[] }[];
+    imageUrl?: string; 
+
+
+  }
+
   const posts = await client.fetch(queryPost);
 
   return (
     <div className="px-4 sm:px-12 lg:px-28 p-6">
       <h1 className="text-3xl font-bold text-center mb-8">Blog Posts</h1>
       <div className="flex flex-wrap -mx-4">
-        {posts.map((post:any, index:number) => (
+        {posts.map((post:Block) => (
           <div key={post.slug} className="w-full sm:w-1/2 xl:w-1/3 px-4 mb-6">
             <div className="rounded-lg shadow-md border border-white overflow-hidden">
               <div className="p-6">

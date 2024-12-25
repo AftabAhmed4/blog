@@ -1,54 +1,59 @@
-// // pages/posts/[slug].ts
-
-import React from 'react'
-import Image from 'next/image'
+import React from 'react';
+import Image from 'next/image';
 import { client } from '@/sanity/lib/client';
 import CommentSection from '@/components/Comment';
 
+interface Block {
+  children: { text: string }[];
+}
 
+interface BlogDetailProps {
+  params: {
+    slug: string;
+  };
+}
 
-export default async function blogDetail({params:{slug}}: {params:{slug:string}} ) {
-    const queryPost = `*[_type == "blogPost" && slug.current == '${slug}'][0]{
-      title,
-      body,
-      "author": author,
-      _createdAt,
-      "imageUrl": image.asset->url
-    }`;
-  
-    const post = await client.fetch(queryPost);
+export default async function blogDetail({ params }: BlogDetailProps) {
+  const { slug } = params;
 
+  const queryPost = `*[_type == "blogPost" && slug.current == '${slug}'][0]{
+    title,
+    body,
+    "author": author,
+    _createdAt,
+    "imageUrl": image.asset->url
+  }`;
 
+  const post = await client.fetch(queryPost);
 
-    return(
-      <div className='my-16'>
-        
-        <div className="px-4 sm:px-12 lg:px-28 p-6">
-       <h1 className="text-3xl font-bold text-center mb-8">{post.title}</h1>
-       <p className="text-sm text-gray-500 mb-2">
-         Published on: {new Date(post._createdAt).toLocaleDateString()}
-     </p>
-      <p className="text-sm text-gray-600 mb-4">By: {post.author}</p>
-       <div className="mb-6 my-7">
-         <Image
-          src={post.imageUrl}
-          alt={post.title}
-          width={500}
-          height={500}
-          className="w-full h-64 sm:h-80 object-cover rounded-lg mb-4"
-        />
+  return (
+    <div className="my-16">
+      <div className="px-4 sm:px-12 lg:px-28 p-6">
+        <h1 className="text-3xl font-bold text-center mb-8">{post.title}</h1>
+        <p className="text-sm text-gray-500 mb-2">
+          Published on: {new Date(post._createdAt).toLocaleDateString()}
+        </p>
+        <p className="text-sm text-gray-600 mb-4">By: {post.author}</p>
+        <div className="mb-6 my-7">
+          <Image
+            src={post.imageUrl}
+            alt={post.title}
+            width={500}
+            height={500}
+            className="w-full h-64 sm:h-80 object-cover rounded-lg mb-4"
+          />
+        </div>
+        <div className="mb-4">
+          {/* Render the body content, assuming it's an array of blocks */}
+          {post.body.map((block: Block, index: number) => (
+            <p key={index}>{block.children[0]?.text}</p>
+          ))}
+        </div>
       </div>
-      <div className="mb-4">
-        {/* Render the body content, assuming it's an array of blocks */}
-        {post.body.map((block:any, index:any) => (
-          <p key={index}>{block.children[0]?.text}</p>
-        ))}
-      </div>
+
+      <CommentSection />
     </div>
-
-    <CommentSection/>
-      </div>
-    )
+  );
 }
 
 
